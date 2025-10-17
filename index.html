@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Product Catalog</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f4f4f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px #ccc;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .product {
+      background: white;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛍 Simple Product Catalog</h1>
+
+  <form id="productForm">
+    <input type="text" id="name" placeholder="Product Name" required />
+    <input type="number" id="price" placeholder="Price" required />
+    <textarea id="description" placeholder="Description"></textarea>
+    <button type="submit">Add Product</button>
+  </form>
+
+  <div id="products"></div>
+
+  <script>
+    const form = document.getElementById('productForm');
+    const productsDiv = document.getElementById('products');
+
+    async function loadProducts() {
+      const res = await fetch('/products');
+      const data = await res.json();
+      productsDiv.innerHTML = data.map(p => `
+        <div class="product">
+          <h3>${p.name}</h3>
+          <p>💰 ${p.price}</p>
+          <p>${p.description || ''}</p>
+        </div>
+      `).join('');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newProduct = {
+        name: form.name.value,
+        price: form.price.value,
+        description: form.description.value
+      };
+      await fetch('/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct)
+      });
+      form.reset();
+      loadProducts();
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>
